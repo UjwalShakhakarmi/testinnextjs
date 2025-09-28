@@ -1,3 +1,5 @@
+// Force dynamic rendering for this page
+
 export default async function Home() {
   try {
     const data = await fetchData();
@@ -22,9 +24,7 @@ const fetchData = async () => {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
-        cache: "no-store",
         // Add timeout for Vercel
-        signal: AbortSignal.timeout(10000), // 10 second timeout
       }
     );
 
