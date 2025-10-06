@@ -31,29 +31,63 @@ export default function CompanyDataClient() {
       setLoading(true);
       setError(null);
 
-      console.log("Client: Fetching company data...");
+      console.log(
+        "Client: Fetching company data directly from external API..."
+      );
 
-      const response = await fetch("/api/company", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        cache: "no-store",
-      });
+      // Call external API directly from client instead of through our API route
+      const response = await fetch(
+        "https://flutter.mydynamicerp.com/v1/General/GetAboutCompany",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          cache: "no-store",
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const result = await response.json();
-      console.log("Client: API response:", result);
+      console.log("Client: Direct API response:", result);
       setData(result);
     } catch (err) {
-      console.error("Client: API error:", err);
+      console.error(
+        "Client: Direct API error, trying internal API fallback:",
+        err
+      );
+
+      // Fallback to internal API route (though it's failing)
+      try {
+        const response = await fetch("/api/company", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          cache: "no-store",
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          console.log("Client: Internal API fallback success:", result);
+          setData(result);
+          return;
+        }
+      } catch (fallbackErr) {
+        console.error(
+          "Client: Internal API fallback also failed:",
+          fallbackErr
+        );
+      }
+
       setError(err instanceof Error ? err.message : "Unknown error");
 
-      // Use fallback data if API fails
+      // Use fallback data if both APIs fail
       console.log("Client: Using fallback data");
       setData(FALLBACK_DATA);
     } finally {

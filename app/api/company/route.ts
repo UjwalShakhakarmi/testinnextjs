@@ -13,8 +13,11 @@ export async function GET() {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "User-Agent": "Mozilla/5.0 (compatible; Next.js/14.0; +https://nextjs.org)",
-          "Referer": process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000",
+          "User-Agent":
+            "Mozilla/5.0 (compatible; Next.js/14.0; +https://nextjs.org)",
+          Referer: process.env.VERCEL_URL
+            ? `https://${process.env.VERCEL_URL}`
+            : "http://localhost:3000",
         },
         cache: "no-store",
         signal: AbortSignal.timeout(10000), // Increased timeout for production
@@ -22,19 +25,22 @@ export async function GET() {
     );
 
     console.log("API route: Response status:", res.status);
-    console.log("API route: Response headers:", Object.fromEntries(res.headers));
+    console.log(
+      "API route: Response headers:",
+      Object.fromEntries(res.headers)
+    );
 
     if (!res.ok) {
       const errorText = await res.text();
       console.error("API route: Error response:", errorText);
       return NextResponse.json(
         { error: `HTTP error! status: ${res.status}, message: ${errorText}` },
-        { 
+        {
           status: res.status,
           headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
           },
         }
       );

@@ -20,7 +20,7 @@ export async function GET() {
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV,
     vercelUrl: process.env.VERCEL_URL,
-    tests: []
+    tests: [],
   };
 
   // Test 1: Basic connectivity
@@ -31,19 +31,19 @@ export async function GET() {
       signal: AbortSignal.timeout(5000),
     });
     const endTime = Date.now();
-    
+
     testResults.tests.push({
       name: "Basic connectivity to flutter.mydynamicerp.com",
       status: response.status,
       success: response.ok,
       responseTime: `${endTime - startTime}ms`,
-      headers: Object.fromEntries(response.headers)
+      headers: Object.fromEntries(response.headers),
     });
   } catch (error) {
     testResults.tests.push({
       name: "Basic connectivity to flutter.mydynamicerp.com",
       success: false,
-      error: error instanceof Error ? error.message : String(error)
+      error: error instanceof Error ? error.message : String(error),
     });
   }
 
@@ -63,10 +63,10 @@ export async function GET() {
       }
     );
     const endTime = Date.now();
-    
+
     let data = null;
     let errorText = null;
-    
+
     try {
       if (response.ok) {
         data = await response.json();
@@ -84,21 +84,21 @@ export async function GET() {
       responseTime: `${endTime - startTime}ms`,
       headers: Object.fromEntries(response.headers),
       data: data ? "Data received successfully" : null,
-      error: errorText || undefined
+      error: errorText || undefined,
     });
   } catch (error) {
     testResults.tests.push({
       name: "API endpoint test",
       success: false,
-      error: error instanceof Error ? error.message : String(error)
+      error: error instanceof Error ? error.message : String(error),
     });
   }
 
   return NextResponse.json(testResults, {
     headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
     },
   });
 }
@@ -107,9 +107,9 @@ export async function OPTIONS() {
   return new NextResponse(null, {
     status: 200,
     headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
     },
   });
 }
