@@ -9,6 +9,20 @@ interface CompanyData {
   Address?: string;
   PhoneNo?: string;
   WebSite?: string;
+  // OpenWeather API fields for testing
+  name?: string;
+  main?: {
+    temp: number;
+    feels_like: number;
+    humidity: number;
+  };
+  weather?: Array<{
+    main: string;
+    description: string;
+  }>;
+  sys?: {
+    country: string;
+  };
 }
 
 // Fallback data in case API fails
@@ -18,6 +32,22 @@ const FALLBACK_DATA: CompanyData = {
   Address: "B & S Complex, Shankhamul Marga, Kathmandu",
   PhoneNo: "+977-51-522961",
   WebSite: "https://dynamic.net.np/contact-us",
+  // Test data for OpenWeather
+  name: "Kathmandu",
+  main: {
+    temp: 20,
+    feels_like: 22,
+    humidity: 65,
+  },
+  weather: [
+    {
+      main: "Clear",
+      description: "clear sky",
+    },
+  ],
+  sys: {
+    country: "NP",
+  },
 };
 
 export default function CompanyDataClient() {
@@ -31,19 +61,14 @@ export default function CompanyDataClient() {
       setLoading(true);
       setError(null);
 
-      console.log(
-        "Client: Fetching company data directly from external API..."
-      );
+      console.log("Client: Testing with OpenWeather API...");
 
-      // Call external API directly from client instead of through our API route
+      // Test with OpenWeather API (free, no CORS issues)
+      // Using Kathmandu weather as test data
       const response = await fetch(
-        "https://flutter.mydynamicerp.com/v1/General/GetAboutCompany",
+        "https://api.openweathermap.org/data/2.5/weather?q=Kathmandu,NP&appid=b6907d289e10d714a6e88b30761fae22&units=metric",
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
+          method: "GET",
           cache: "no-store",
         }
       );
@@ -53,36 +78,34 @@ export default function CompanyDataClient() {
       }
 
       const result = await response.json();
-      console.log("Client: Direct API response:", result);
+      console.log("Client: OpenWeather API response:", result);
       setData(result);
     } catch (err) {
-      console.error(
-        "Client: Direct API error, trying internal API fallback:",
-        err
-      );
+      console.error("Client: OpenWeather API error, trying original API:", err);
 
-      // Fallback to internal API route (though it's failing)
+      // Fallback to original API for comparison
       try {
-        const response = await fetch("/api/company", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          cache: "no-store",
-        });
+        console.log("Client: Trying original flutter API...");
+        const response = await fetch(
+          "https://flutter.mydynamicerp.com/v1/General/GetAboutCompany",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            cache: "no-store",
+          }
+        );
 
         if (response.ok) {
           const result = await response.json();
-          console.log("Client: Internal API fallback success:", result);
+          console.log("Client: Original API fallback success:", result);
           setData(result);
           return;
         }
       } catch (fallbackErr) {
-        console.error(
-          "Client: Internal API fallback also failed:",
-          fallbackErr
-        );
+        console.error("Client: Original API also failed:", fallbackErr);
       }
 
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -122,13 +145,41 @@ export default function CompanyDataClient() {
   }
 
   const companyName =
-    data.HD_CompanyName || data.Name || "Company Name Not Available";
+    data.HD_CompanyName ||
+    data.Name ||
+    data.name || // OpenWeather city name
+    "Company Name Not Available";
   const isUsingFallback = error !== null;
 
   return (
     <div className="company-data">
       <h1>{companyName}</h1>
 
+      {/* Show OpenWeather data if available */}
+      {data.main && (
+        <div className="weather-info">
+          <h3>🌤️ Weather Test Data (OpenWeather API)</h3>
+          <p>
+            <strong>Temperature:</strong> {data.main.temp}°C (feels like{" "}
+            {data.main.feels_like}°C)
+          </p>
+          <p>
+            <strong>Humidity:</strong> {data.main.humidity}%
+          </p>
+          {data.weather && data.weather[0] && (
+            <p>
+              <strong>Conditions:</strong> {data.weather[0].description}
+            </p>
+          )}
+          {data.sys && (
+            <p>
+              <strong>Country:</strong> {data.sys.country}
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Show original company data if available */}
       {data.HD_Slogan && <p className="slogan">{data.HD_Slogan}</p>}
 
       {data.Address && <p className="address">{data.Address}</p>}
@@ -160,6 +211,29 @@ export default function CompanyDataClient() {
         </div>
       )}
 
+      <div
+        className="api-status"
+        style={{
+          marginTop: "20px",
+          padding: "10px",
+          backgroundColor: "#f0f8ff",
+          borderRadius: "4px",
+        }}
+      >
+        <h4>🔍 API Test Status:</h4>
+        <p>
+          <strong>Primary Test:</strong> OpenWeather API (should work without
+          CORS issues)
+        </p>
+        <p>
+          <strong>Fallback Test:</strong> Original Flutter API (may have
+          CORS/network issues)
+        </p>
+        <p>
+          <strong>Error:</strong> {error || "None"}
+        </p>
+      </div>
+
       <style jsx>{`
         .company-data {
           padding: 20px;
@@ -182,6 +256,19 @@ export default function CompanyDataClient() {
         .phone {
           margin: 8px 0;
           color: #555;
+        }
+
+        .weather-info {
+          background-color: #e8f4fd;
+          padding: 15px;
+          border-radius: 8px;
+          margin: 15px 0;
+          border-left: 4px solid #007bff;
+        }
+
+        .weather-info h3 {
+          margin-top: 0;
+          color: #0056b3;
         }
 
         .website {
