@@ -1,7 +1,7 @@
 async function getKathmanduWeather() {
   try {
     const geoResponse = await fetch(
-      `${process.env.BASE_URL}/v1/General/GetMeritAchievers`,
+      `https://flutter.mydynamicerp.com/v1/General/GetMeritAchievers`,
       {
         method: "POST",
         headers: {
@@ -11,7 +11,15 @@ async function getKathmanduWeather() {
         signal: AbortSignal.timeout(10000),
       }
     );
-    const geoData = await geoResponse.json();
+
+    console.log("Response status:", geoResponse.status);
+
+    const textResponse = await geoResponse.text(); // Get as text first
+    console.log("Raw response:", textResponse);
+
+    const geoData = JSON.parse(textResponse); // Then parse
+    console.log("Parsed data:", geoData);
+
     return geoData;
   } catch (error) {
     console.error("Error fetching weather:", error);
