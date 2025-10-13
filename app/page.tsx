@@ -1,3 +1,6 @@
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 async function getKathmanduWeather() {
   try {
     const geoResponse = await fetch(
