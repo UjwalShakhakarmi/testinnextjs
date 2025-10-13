@@ -29,7 +29,10 @@ async function getKathmanduWeather() {
     return data;
   } catch (error) {
     console.error("Error calling API route:", error);
-    return { error: error.message };
+    if (error instanceof Error) {
+      return { error: error.message };
+    }
+    return { error: String(error) };
   }
 }
 

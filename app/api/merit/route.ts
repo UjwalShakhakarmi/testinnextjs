@@ -34,13 +34,34 @@ export async function GET() {
     return NextResponse.json(data);
   } catch (error) {
     console.error("API Route Error:", error);
+
+    // Narrow unknown to Error when possible
+    if (error instanceof Error) {
+      return NextResponse.json(
+        {
+          error: error.name,
+          message: error.message,
+          stack: error.stack,
+        },
+        { status: 500 }
+      );
+    }
+
+    // Fallback for non-Error throwables
     return NextResponse.json(
-      {
-        error: error.name,
-        message: error.message,
-        stack: error.stack,
-      },
+      { error: "UnknownError", message: String(error) },
       { status: 500 }
     );
   }
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    },
+  });
 }
