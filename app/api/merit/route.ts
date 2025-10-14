@@ -5,7 +5,7 @@ export async function GET() {
   console.log("BASE_URL:", process.env.BASE_URL);
 
   try {
-    const url = `${process.env.BASE_URL}/v1/General/GetMeritAchievers`;
+    const url = `${process.env.BASE_URL}/v1/General/GetIntroduction`;
     console.log("Fetching from:", url);
 
     const response = await fetch(url, {

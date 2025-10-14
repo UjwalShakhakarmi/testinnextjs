@@ -40,7 +40,7 @@ export default async function Home() {
   const weather = await getKathmanduWeather();
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-accent/10 p-8">
+    <main className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-accent/10 p-8 text-black">
       <div className="bg-white rounded-lg shadow-lg p-6">
         <h1 className="text-2xl font-bold mb-4">API Response</h1>
 
