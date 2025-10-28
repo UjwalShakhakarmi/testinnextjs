@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   env: {
-    BASEURL: "https://flutter.mydynamicerp.com/",
+    BASEURL: "https://kalikaschoolbtl.mydynamicerp.com/",
   },
 };
 
